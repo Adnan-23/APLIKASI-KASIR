@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1d4ed8">
+<title>Aplikasi Kasir</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>🛒 Kasir Toko</h1>
+  <nav>
+    <button data-tab="kasir" class="active">Kasir</button>
+    <button data-tab="produk">Produk</button>
+    <button data-tab="riwayat">Riwayat</button>
+  </nav>
+</header>
+
+<main>
+  <!-- KASIR -->
+  <section id="tab-kasir" class="tab active">
+    <div class="row">
+      <input id="scanInput" type="text" placeholder="Scan barcode / ketik nama produk lalu Enter" autocomplete="off" autofocus>
+      <button id="btnCamKasir" class="btn">📷 Scan</button>
+    </div>
+    <div id="suggest" class="suggest"></div>
+
+    <table class="tbl">
+      <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody id="cartBody"></tbody>
+    </table>
+    <p id="cartEmpty" class="muted">Keranjang kosong. Scan atau cari produk.</p>
+
+    <div class="pay">
+      <div class="total">Total: <strong id="total">Rp 0</strong></div>
+      <label>Uang diterima
+        <input id="paid" type="number" inputmode="numeric" min="0" placeholder="0">
+      </label>
+      <div class="total">Kembali: <strong id="change">Rp 0</strong></div>
+      <div class="row">
+        <button id="btnPay" class="btn primary">Bayar &amp; Cetak Struk</button>
+        <button id="btnClear" class="btn">Kosongkan</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUK -->
+  <section id="tab-produk" class="tab">
+    <form id="prodForm" class="form">
+      <input type="hidden" id="pId">
+      <label>Barcode
+        <span class="row"><input id="pBarcode" required><button type="button" id="btnCamProd" class="btn">📷</button></span>
+      </label>
+      <label>Nama produk <input id="pName" required></label>
+      <label>Harga eceran (Rp) <input id="pRetail" type="number" min="0" required></label>
+      <label>Harga grosir (Rp) <input id="pWholesale" type="number" min="0" placeholder="kosongkan jika tidak ada"></label>
+      <label>Min. qty grosir <input id="pMinWs" type="number" min="1" placeholder="mis. 12"></label>
+      <label>Stok <input id="pStock" type="number" min="0" value="0" required></label>
+      <div class="row">
+        <button class="btn primary" type="submit">Simpan</button>
+        <button class="btn" type="button" id="btnResetForm">Batal</button>
+      </div>
+    </form>
+    <input id="prodSearch" placeholder="Cari produk..." class="full">
+    <table class="tbl">
+      <thead><tr><th>Produk</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th></tr></thead>
+      <tbody id="prodBody"></tbody>
+    </table>
+    <div class="row">
+      <button class="btn" id="btnBackup">⬇ Backup data</button>
+      <label class="btn">⬆ Restore data<input type="file" id="fileRestore" accept=".json" hidden></label>
+    </div>
+  </section>
+
+  <!-- RIWAYAT -->
+  <section id="tab-riwayat" class="tab">
+    <div class="cards">
+      <div class="card">Penjualan hari ini<strong id="rToday">Rp 0</strong></div>
+      <div class="card">Transaksi hari ini<strong id="rCount">0</strong></div>
+    </div>
+    <button class="btn" id="btnCsv">⬇ Ekspor CSV</button>
+    <table class="tbl">
+      <thead><tr><th>Waktu</th><th>Item</th><th>Total</th><th></th></tr></thead>
+      <tbody id="histBody"></tbody>
+    </table>
+  </section>
+</main>
+
+<!-- Scanner modal -->
+<div id="scanModal" class="modal" hidden>
+  <div class="modal-box">
+    <div id="reader"></div>
+    <p class="muted">Arahkan kamera ke barcode.</p>
+    <button class="btn" id="btnCloseScan">Tutup</button>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

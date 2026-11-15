@@ -1,0 +1,39 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:#f3f4f6;color:#111827}
+header{background:#1d4ed8;color:#fff;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{font-size:1.2rem;margin:0}
+nav button{background:transparent;color:#fff;border:0;padding:8px 14px;border-radius:6px;font-size:1rem;cursor:pointer}
+nav button.active{background:#fff;color:#1d4ed8;font-weight:600}
+main{max-width:900px;margin:0 auto;padding:12px}
+.tab{display:none}.tab.active{display:block}
+.row{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+input{padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem;width:100%}
+.row input{flex:1;min-width:0}
+.btn{background:#e5e7eb;border:0;padding:10px 14px;border-radius:6px;font-size:1rem;cursor:pointer;white-space:nowrap}
+.btn.primary{background:#16a34a;color:#fff;font-weight:600}
+.btn.danger{background:#dc2626;color:#fff}
+.btn.sm{padding:5px 9px;font-size:.85rem}
+.tbl{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;margin:8px 0}
+.tbl th,.tbl td{padding:8px;text-align:left;border-bottom:1px solid #e5e7eb;font-size:.95rem}
+.tbl td input{width:70px;padding:6px}
+.muted{color:#6b7280}
+.pay{background:#fff;padding:12px;border-radius:8px;margin-top:10px}
+.pay label{display:block;margin:8px 0}
+.total{font-size:1.2rem;margin:6px 0}
+.total strong{font-size:1.6rem}
+.form{background:#fff;padding:12px;border-radius:8px;display:grid;gap:8px;margin-bottom:10px}
+.form label{display:grid;gap:4px;font-size:.9rem}
+.full{margin:8px 0}
+.suggest{background:#fff;border-radius:6px}
+.suggest div{padding:10px;border-bottom:1px solid #e5e7eb;cursor:pointer}
+.suggest div:hover{background:#eff6ff}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.card{background:#fff;padding:12px;border-radius:8px}
+.card strong{display:block;font-size:1.4rem}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10}
+.modal[hidden]{display:none}
+.modal-box{background:#fff;padding:14px;border-radius:10px;width:92%;max-width:460px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:8px;z-index:20}
+.toast[hidden]{display:none}
+.badge{background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-size:.75rem}
+@media(max-width:600px){.tbl th,.tbl td{padding:6px 4px;font-size:.85rem}}

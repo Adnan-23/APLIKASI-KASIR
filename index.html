@@ -6,13 +6,14 @@
 <meta name="theme-color" content="#1d4ed8">
 <title>Aplikasi Kasir</title>
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 <header>
   <h1 id="shopTitle">🛒 Kasir Toko</h1>
   <nav id="nav">
-    <button data-tab="kasir" class="active">Kasir</button>
+    <button data-tab="beranda" class="active">🏠 Beranda</button>
+    <button data-tab="kasir">Kasir</button>
     <button data-tab="produk">Produk</button>
     <button data-tab="stok">Stok</button>
     <button data-tab="pelanggan">Pelanggan</button>
@@ -23,8 +24,28 @@
 </header>
 
 <main>
+<!-- BERANDA -->
+<section id="tab-beranda" class="tab active">
+  <div class="hero">
+    <div><div class="muted" id="dDate"></div><h2 id="dShop"></h2></div>
+    <button class="btn primary big" data-go="kasir">🛒 Mulai Transaksi</button>
+  </div>
+  <div class="stats">
+    <div class="stat" data-go="laporan"><span>Penjualan hari ini</span><strong id="dSales">Rp 0</strong></div>
+    <div class="stat" data-go="laporan"><span>Transaksi hari ini</span><strong id="dTrx">0</strong></div>
+    <div class="stat" data-go="laporan"><span>Laba kotor hari ini</span><strong id="dProfit">Rp 0</strong></div>
+    <div class="stat" data-go="pelanggan"><span>Utang belum dibayar</span><strong id="dDebt">Rp 0</strong></div>
+  </div>
+  <h3 class="sec">Menu</h3>
+  <div class="menu" id="dMenu"></div>
+  <h3 class="sec">Penjualan 7 hari terakhir</h3>
+  <div class="card" id="dChart"></div>
+  <h3 class="sec">Perlu perhatian</h3>
+  <div class="card" id="dAlerts"></div>
+</section>
+
 <!-- KASIR -->
-<section id="tab-kasir" class="tab active">
+<section id="tab-kasir" class="tab">
   <div class="row">
     <input id="scanInput" placeholder="Scan barcode / ketik nama produk lalu Enter" autocomplete="off">
     <button id="btnCamKasir" class="btn">📷 Scan</button>
@@ -222,6 +243,6 @@
 <div id="toast" class="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

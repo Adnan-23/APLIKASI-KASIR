@@ -55,21 +55,65 @@ const saleDebt = (s) => (s.void ? 0 : Math.max(0, s.total - s.paid));
 const saleCost = (s) => s.items.reduce((a, i) => a + (i.cost || 0) * i.qty, 0);
 
 /* ================= Tab ================= */
-const tabRender = { produk: renderProducts, stok: renderStok, pelanggan: renderCustomers, pengeluaran: renderExpenses, laporan: renderReport, setelan: renderSettings };
-document.querySelectorAll("#nav button").forEach((b) => b.onclick = () => {
-  const tab = b.dataset.tab;
+const tabRender = { beranda: renderDash, produk: renderProducts, stok: renderStok, pelanggan: renderCustomers, pengeluaran: renderExpenses, laporan: renderReport, setelan: renderSettings };
+function goTab(tab) {
   if (tab === "laporan" && S.settings.pin && !unlocked) {
     if (prompt("Masukkan PIN laporan") !== S.settings.pin) return toast("PIN salah");
     unlocked = true;
   }
   showTab(tab);
-});
+}
+document.querySelectorAll("#nav button").forEach((b) => b.onclick = () => goTab(b.dataset.tab));
+document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) goTab(g.dataset.go); });
 function showTab(tab) {
   document.querySelectorAll("#nav button").forEach((x) => x.classList.toggle("active", x.dataset.tab === tab));
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.id === "tab-" + tab));
   refreshLookups();
   if (tabRender[tab]) tabRender[tab]();
-  if (tab === "kasir") $("#scanInput").focus();
+  window.scrollTo({ top: 0 });
+  if (tab === "kasir" && matchMedia("(pointer:fine)").matches) $("#scanInput").focus();
+}
+
+/* ================= Beranda (dashboard) ================= */
+function renderDash() {
+  const today = dayStr(), from = startOf(today), to = endOf(today);
+  const ok = S.sales.filter((s) => !s.void && s.time >= from && s.time <= to);
+  const rev = ok.reduce((a, s) => a + s.total, 0), cost = ok.reduce((a, s) => a + saleCost(s), 0);
+  const debtAll = S.sales.reduce((a, s) => a + saleDebt(s), 0);
+  $("#dDate").textContent = new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  $("#dShop").textContent = S.settings.shop;
+  $("#dSales").textContent = rp(rev); $("#dTrx").textContent = ok.length; $("#dProfit").textContent = rp(rev - cost); $("#dDebt").textContent = rp(debtAll);
+
+  const empty = S.products.filter((p) => p.stock <= 0), low = S.products.filter((p) => p.stock > 0 && p.minStock && p.stock <= p.minStock);
+  const debtors = S.customers.filter((c) => custDebt(c.id) > 0);
+  const expToday = S.expenses.filter((x) => x.time >= from && x.time <= to).reduce((a, x) => a + x.amount, 0);
+  const menu = [
+    { tab: "kasir", icon: "🛒", t: "Kasir", sub: "Transaksi baru", c: "#16a34a" },
+    { tab: "produk", icon: "📦", t: "Produk", sub: S.products.length + " produk", c: "#2563eb" },
+    { tab: "stok", icon: "🏷️", t: "Stok", sub: empty.length + low.length ? (empty.length + low.length) + " perlu perhatian" : "Aman", c: "#f59e0b", alert: empty.length + low.length },
+    { tab: "pelanggan", icon: "👥", t: "Pelanggan", sub: debtors.length ? debtors.length + " punya utang" : S.customers.length + " pelanggan", c: "#8b5cf6", alert: debtors.length },
+    { tab: "pengeluaran", icon: "💸", t: "Pengeluaran", sub: "Hari ini " + rp(expToday), c: "#ef4444" },
+    { tab: "laporan", icon: "📊", t: "Laporan", sub: "Penjualan & laba", c: "#0891b2" },
+    { tab: "setelan", icon: "⚙️", t: "Pengaturan", sub: "Toko, struk, backup", c: "#64748b" }
+  ];
+  $("#dMenu").innerHTML = menu.map((m) => `<button class="mcard" data-go="${m.tab}" style="--c:${m.c}">
+    <span class="ico">${m.icon}</span><b>${m.t}</b><small>${esc(m.sub)}</small>${m.alert ? `<i class="dot">${m.alert}</i>` : ""}</button>`).join("");
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = dayStr(d.getTime());
+    const v = S.sales.filter((s) => !s.void && s.time >= startOf(ds) && s.time <= endOf(ds)).reduce((a, s) => a + s.total, 0);
+    days.push({ l: d.toLocaleDateString("id-ID", { weekday: "short" }), v });
+  }
+  const max = Math.max(...days.map((d) => d.v), 1);
+  $("#dChart").innerHTML = `<div class="bars">${days.map((d, i) => `<div class="bar${i === 6 ? " now" : ""}"><small>${d.v ? (d.v >= 1e6 ? (d.v / 1e6).toFixed(1) + "jt" : Math.round(d.v / 1e3) + "rb") : ""}</small><div style="height:${Math.max(3, d.v / max * 100)}px"></div><span>${d.l}</span></div>`).join("")}</div>`;
+
+  const al = [];
+  empty.slice(0, 5).forEach((p) => al.push(`<div class="alert" data-go="stok"><span class="badge red">Kosong</span> ${esc(p.name)}</div>`));
+  low.slice(0, 5).forEach((p) => al.push(`<div class="alert" data-go="stok"><span class="badge">Menipis</span> ${esc(p.name)} — sisa ${p.stock}</div>`));
+  debtors.slice(0, 5).forEach((c) => al.push(`<div class="alert" data-go="pelanggan"><span class="badge red">Utang</span> ${esc(c.name)} — ${rp(custDebt(c.id))}</div>`));
+  $("#dAlerts").innerHTML = al.length ? al.join("") : '<span class="muted">✅ Semua aman. Tidak ada stok kosong atau utang.</span>';
 }
 function refreshLookups() {
   fillSelect($("#pCat"), S.categories.map((c) => ({ v: c, t: c })), "(tanpa kategori)");
@@ -534,4 +578,4 @@ $("#fileRestore").onchange = (e) => {
 };
 
 /* ================= Mulai ================= */
-refreshLookups(); renderCart();
+refreshLookups(); renderCart(); showTab("beranda");

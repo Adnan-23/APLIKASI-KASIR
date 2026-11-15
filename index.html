@@ -10,85 +10,208 @@
 </head>
 <body>
 <header>
-  <h1>🛒 Kasir Toko</h1>
-  <nav>
+  <h1 id="shopTitle">🛒 Kasir Toko</h1>
+  <nav id="nav">
     <button data-tab="kasir" class="active">Kasir</button>
     <button data-tab="produk">Produk</button>
-    <button data-tab="riwayat">Riwayat</button>
+    <button data-tab="stok">Stok</button>
+    <button data-tab="pelanggan">Pelanggan</button>
+    <button data-tab="pengeluaran">Pengeluaran</button>
+    <button data-tab="laporan">Laporan</button>
+    <button data-tab="setelan">Pengaturan</button>
   </nav>
 </header>
 
 <main>
-  <!-- KASIR -->
-  <section id="tab-kasir" class="tab active">
+<!-- KASIR -->
+<section id="tab-kasir" class="tab active">
+  <div class="row">
+    <input id="scanInput" placeholder="Scan barcode / ketik nama produk lalu Enter" autocomplete="off">
+    <button id="btnCamKasir" class="btn">📷 Scan</button>
+  </div>
+  <div id="suggest" class="suggest"></div>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Diskon (Rp)</th><th>Subtotal</th><th></th></tr></thead>
+    <tbody id="cartBody"></tbody>
+  </table></div>
+  <p id="cartEmpty" class="muted">Keranjang kosong. Scan atau cari produk.</p>
+
+  <div class="pay">
+    <div class="grid2">
+      <label>Pelanggan
+        <span class="row"><select id="custSel"></select><button class="btn sm" id="btnNewCust" type="button">+ Baru</button></span>
+      </label>
+      <label>Metode bayar <select id="methodSel"></select></label>
+      <label>Diskon nota (Rp) <input id="discNota" type="number" min="0" inputmode="numeric" placeholder="0"></label>
+      <label>Catatan <input id="note" placeholder="opsional"></label>
+    </div>
+    <div class="total">Total: <strong id="total">Rp 0</strong></div>
+    <label class="chk"><input type="checkbox" id="chkDebt"> Belum bayar / utang (boleh bayar sebagian di bawah)</label>
+    <label>Uang diterima <input id="paid" type="number" min="0" inputmode="numeric" placeholder="0"></label>
+    <div class="total"><span id="changeLbl">Kembali</span>: <strong id="change">Rp 0</strong></div>
     <div class="row">
-      <input id="scanInput" type="text" placeholder="Scan barcode / ketik nama produk lalu Enter" autocomplete="off" autofocus>
-      <button id="btnCamKasir" class="btn">📷 Scan</button>
+      <button id="btnPay" class="btn primary">Bayar &amp; Cetak Struk</button>
+      <button id="btnClear" class="btn">Kosongkan</button>
     </div>
-    <div id="suggest" class="suggest"></div>
+  </div>
+</section>
 
-    <table class="tbl">
-      <thead><tr><th>Produk</th><th>Qty</th><th>Harga</th><th>Subtotal</th><th></th></tr></thead>
-      <tbody id="cartBody"></tbody>
-    </table>
-    <p id="cartEmpty" class="muted">Keranjang kosong. Scan atau cari produk.</p>
-
-    <div class="pay">
-      <div class="total">Total: <strong id="total">Rp 0</strong></div>
-      <label>Uang diterima
-        <input id="paid" type="number" inputmode="numeric" min="0" placeholder="0">
-      </label>
-      <div class="total">Kembali: <strong id="change">Rp 0</strong></div>
-      <div class="row">
-        <button id="btnPay" class="btn primary">Bayar &amp; Cetak Struk</button>
-        <button id="btnClear" class="btn">Kosongkan</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRODUK -->
-  <section id="tab-produk" class="tab">
-    <form id="prodForm" class="form">
-      <input type="hidden" id="pId">
-      <label>Barcode
-        <span class="row"><input id="pBarcode" required><button type="button" id="btnCamProd" class="btn">📷</button></span>
-      </label>
-      <label>Nama produk <input id="pName" required></label>
-      <label>Harga eceran (Rp) <input id="pRetail" type="number" min="0" required></label>
+<!-- PRODUK -->
+<section id="tab-produk" class="tab">
+  <form id="prodForm" class="form">
+    <h3 id="prodFormTitle">Tambah produk</h3>
+    <input type="hidden" id="pId">
+    <label>Barcode
+      <span class="row"><input id="pBarcode" required><button type="button" id="btnCamProd" class="btn">📷</button><button type="button" id="btnGenBarcode" class="btn">Otomatis</button></span>
+    </label>
+    <label>Nama produk <input id="pName" required></label>
+    <label>Kategori <select id="pCat"></select></label>
+    <div class="grid2">
+      <label>Harga beli / modal (Rp) <input id="pCost" type="number" min="0" value="0"></label>
+      <label>Harga jual eceran (Rp) <input id="pRetail" type="number" min="0" required></label>
       <label>Harga grosir (Rp) <input id="pWholesale" type="number" min="0" placeholder="kosongkan jika tidak ada"></label>
       <label>Min. qty grosir <input id="pMinWs" type="number" min="1" placeholder="mis. 12"></label>
       <label>Stok <input id="pStock" type="number" min="0" value="0" required></label>
-      <div class="row">
-        <button class="btn primary" type="submit">Simpan</button>
-        <button class="btn" type="button" id="btnResetForm">Batal</button>
-      </div>
-    </form>
-    <input id="prodSearch" placeholder="Cari produk..." class="full">
-    <table class="tbl">
-      <thead><tr><th>Produk</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th></tr></thead>
-      <tbody id="prodBody"></tbody>
-    </table>
+      <label>Batas stok minimum <input id="pMinStock" type="number" min="0" value="0"></label>
+    </div>
     <div class="row">
-      <button class="btn" id="btnBackup">⬇ Backup data</button>
-      <label class="btn">⬆ Restore data<input type="file" id="fileRestore" accept=".json" hidden></label>
+      <button class="btn primary" type="submit">Simpan</button>
+      <button class="btn" type="button" id="btnResetForm">Batal</button>
     </div>
-  </section>
+  </form>
+  <div class="row">
+    <input id="prodSearch" placeholder="Cari produk...">
+    <select id="prodCatFilter" class="auto"></select>
+  </div>
+  <div class="row">
+    <button class="btn sm" id="btnSelAll">Pilih semua</button>
+    <button class="btn sm" id="btnLabel">🏷 Cetak label barcode (terpilih)</button>
+    <button class="btn sm danger" id="btnDelSel">Hapus terpilih</button>
+  </div>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th></th><th>Produk</th><th>Beli</th><th>Eceran</th><th>Grosir</th><th>Stok</th><th></th></tr></thead>
+    <tbody id="prodBody"></tbody>
+  </table></div>
+</section>
 
-  <!-- RIWAYAT -->
-  <section id="tab-riwayat" class="tab">
-    <div class="cards">
-      <div class="card">Penjualan hari ini<strong id="rToday">Rp 0</strong></div>
-      <div class="card">Transaksi hari ini<strong id="rCount">0</strong></div>
+<!-- STOK -->
+<section id="tab-stok" class="tab">
+  <div class="cards">
+    <div class="card">Asset stok (modal)<strong id="aCost">Rp 0</strong></div>
+    <div class="card">Asset stok (jual)<strong id="aSell">Rp 0</strong></div>
+    <div class="card">Barang kosong<strong id="aEmpty">0</strong></div>
+    <div class="card">Stok menipis<strong id="aLow">0</strong></div>
+  </div>
+  <input id="stokSearch" class="full" placeholder="Cari produk...">
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Produk</th><th>Stok</th><th>Min</th><th>Atur stok</th></tr></thead>
+    <tbody id="stokBody"></tbody>
+  </table></div>
+  <h3>Log stok</h3>
+  <div class="row"><button class="btn sm" id="btnLogCsv">⬇ Ekspor CSV</button><button class="btn sm danger" id="btnLogClear">Hapus log</button></div>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Waktu</th><th>Produk</th><th>Ubah</th><th>Stok akhir</th><th>Alasan</th></tr></thead>
+    <tbody id="logBody"></tbody>
+  </table></div>
+</section>
+
+<!-- PELANGGAN -->
+<section id="tab-pelanggan" class="tab">
+  <form id="custForm" class="form">
+    <h3>Data pelanggan</h3>
+    <input type="hidden" id="cId">
+    <label>Nama <input id="cName" required></label>
+    <label>No. HP <input id="cPhone" inputmode="tel"></label>
+    <div class="row"><button class="btn primary" type="submit">Simpan</button><button class="btn" type="button" id="btnCustReset">Batal</button></div>
+  </form>
+  <input id="custSearch" class="full" placeholder="Cari nama pelanggan...">
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Nama</th><th>HP</th><th>Utang</th><th></th></tr></thead>
+    <tbody id="custBody"></tbody>
+  </table></div>
+</section>
+
+<!-- PENGELUARAN -->
+<section id="tab-pengeluaran" class="tab">
+  <form id="expForm" class="form">
+    <h3>Catat pengeluaran</h3>
+    <input type="hidden" id="eId">
+    <label>Catatan <input id="eNote" required placeholder="Contoh: Bayar listrik toko"></label>
+    <label>Jumlah (Rp) <input id="eAmount" type="number" min="1" required></label>
+    <label>Tanggal <input id="eDate" type="date" required></label>
+    <div class="row"><button class="btn primary" type="submit">Simpan</button><button class="btn" type="button" id="btnExpReset">Batal</button></div>
+  </form>
+  <div class="card">Grand total pengeluaran<strong id="eTotal">Rp 0</strong></div>
+  <div class="scroll"><table class="tbl">
+    <thead><tr><th>Tanggal</th><th>Catatan</th><th>Jumlah</th><th></th></tr></thead>
+    <tbody id="expBody"></tbody>
+  </table></div>
+</section>
+
+<!-- LAPORAN -->
+<section id="tab-laporan" class="tab">
+  <div class="grid2">
+    <label>Dari <input type="date" id="rFrom"></label>
+    <label>Sampai <input type="date" id="rTo"></label>
+    <label>Jenis laporan
+      <select id="rKind">
+        <option value="ringkasan">Ringkasan (penjualan &amp; laba)</option>
+        <option value="transaksi">Transaksi</option>
+        <option value="barang">Barang terjual</option>
+        <option value="kategori">Per kategori</option>
+        <option value="metode">Per metode bayar</option>
+        <option value="stok">Stok saat ini</option>
+      </select>
+    </label>
+    <label>Status transaksi
+      <select id="rStatus"><option value="">Semua</option><option value="lunas">Lunas</option><option value="utang">Belum bayar</option><option value="batal">Dibatalkan</option></select>
+    </label>
+  </div>
+  <div class="row"><button class="btn" id="btnCsv">⬇ Ekspor ke Excel (CSV)</button></div>
+  <div class="scroll"><table class="tbl" id="rTable"><thead></thead><tbody></tbody></table></div>
+</section>
+
+<!-- PENGATURAN -->
+<section id="tab-setelan" class="tab">
+  <div class="form">
+    <h3>Toko &amp; struk</h3>
+    <label>Nama toko <input id="sShop"></label>
+    <label>Alamat / telepon (di struk) <input id="sAddr"></label>
+    <label>Teks bawah struk <input id="sFooter"></label>
+    <label>Lebar kertas struk
+      <select id="sPaper"><option value="58">58 mm</option><option value="80">80 mm</option></select>
+    </label>
+    <label>PIN hak akses laporan (kosongkan jika tidak dipakai) <input id="sPin" type="password" inputmode="numeric"></label>
+    <button class="btn primary" id="btnSaveSet">Simpan pengaturan</button>
+  </div>
+  <div class="form">
+    <h3>Kategori produk</h3>
+    <div class="row"><input id="newCat" placeholder="Nama kategori"><button class="btn" id="btnAddCat">Tambah</button></div>
+    <div id="catList"></div>
+  </div>
+  <div class="form">
+    <h3>Metode bayar</h3>
+    <div class="row"><input id="newMethod" placeholder="Mis. QRIS, Transfer"><button class="btn" id="btnAddMethod">Tambah</button></div>
+    <div id="methodList"></div>
+  </div>
+  <div class="form">
+    <h3>Backup &amp; restore</h3>
+    <div class="row">
+      <button class="btn" id="btnBackup">⬇ Backup data sekarang</button>
+      <label class="btn">⬆ Restore dari file<input type="file" id="fileRestore" accept=".json" hidden></label>
     </div>
-    <button class="btn" id="btnCsv">⬇ Ekspor CSV</button>
-    <table class="tbl">
-      <thead><tr><th>Waktu</th><th>Item</th><th>Total</th><th></th></tr></thead>
-      <tbody id="histBody"></tbody>
-    </table>
-  </section>
+    <p class="muted">Data tersimpan di browser perangkat ini. Backup rutin supaya aman.</p>
+  </div>
+  <div class="form">
+    <h3>Hapus data</h3>
+    <div class="row">
+      <button class="btn danger" id="btnDelSales">Hapus semua transaksi</button>
+      <button class="btn danger" id="btnDelExp">Hapus semua pengeluaran</button>
+    </div>
+  </div>
+</section>
 </main>
 
-<!-- Scanner modal -->
 <div id="scanModal" class="modal" hidden>
   <div class="modal-box">
     <div id="reader"></div>
@@ -96,7 +219,6 @@
     <button class="btn" id="btnCloseScan">Tutup</button>
   </div>
 </div>
-
 <div id="toast" class="toast" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
